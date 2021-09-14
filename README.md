@@ -8,7 +8,7 @@ In this repository i'll learn and practice about BeautifulSoup library on python
 <h2>Repository Description</h2>
 <p>
 This repository created when i decided to learn BeautifulSoup module on python for scraping web sites.
-Because i believe that need to be able to grab any data that i need with using python as a Software Engineer student. So i started to learn BeautifulSoup. 
+Because i believe that i need to be able to grab any data i need with using python as a Software Engineer student. So i started to learn BeautifulSoup. 
 </p>
 <br/>
 
