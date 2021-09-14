@@ -1,0 +1,20 @@
+r = requests.get('https://isthereanydeal.com')      # to send get request to server      
+
+soup = BeautifulSoup(r.content, "lxml")     # open the source code
+
+soup.find("#htmlTag")     # to make search for one thing
+
+soup.find_all("#htmlTag")       # to make a search for every tag in source code
+
+soup.find_all("#htmlTag",attr={})       # to customize your search and select specific tags
+
+soup.find_all("#htmlTag",attr={},limit=#number)     # to limit your search
+
+x = soup.find("#htmlTag")       # to get href value which means where is the link directing you
+x.get("href")               
+
+soup.find_all("#htmlTag", string=[#Text])       # to find the tag by using the text it has 
+
+soup.find("#htmlTag", attr={}).#tag.next_sibling        # to find the next tag that equals to level of your tag that find searching
+
+soup.select("#htmlTag.#SpesicifThingsInTag")       # to find the tags using their specific things, etc: a[href="/ship"] finding a tags that has '/ship' in href
