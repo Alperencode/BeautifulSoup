@@ -1,0 +1,5 @@
+find("#htmlTag", class_= '#ClassName')      # Other method to search using class names
+
+find("#htmlTag", class_= '#ClassName')[#OtherDetails]       # To get more information about tag
+
+soup.select('#htmlTag[class^="#ClassName"]')        # ^ represents for 'give me classes starts with ....'
