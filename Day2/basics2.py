@@ -71,17 +71,18 @@ print(GameNamesWithoutPunctuation)
 for t in GameNamesWithoutPunctuation:
     print(t)
 
-# ---- Getting div tags for prices 
-# DivTagsList = []
-# PriceDivTags = soup.find_all("div",class_="deals dyn-semi")
-# for i in PriceDivTags:
-#     DivTagsList.append(i)
+# ---- Getting div tags for prices ----
+DivTagsList = []
+PriceDivTags = soup.find_all("div",class_="deals dyn-semi")
+for i in PriceDivTags:
+    DivTagsList.append(i)
 
-# for z in DivTagsList:
-#     print(z.prettify())
+# ---- Div prettify() to look inside ----
+for z in DivTagsList:
+    print(z.prettify())
 
 # ---- Game prices ----
-# aTags = soup.select('a[class^="shop"]')
-# for k in aTags:
-#     print(k)
+aTags = soup.select('a[class^="shop"]')
+for k in aTags:
+    print(k)
 
