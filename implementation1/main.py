@@ -3,7 +3,7 @@ import requests
 from bs4 import BeautifulSoup
 # ----- How to make excel
 masterlist = []
-data_dict = {}
+data_dict = {"Category":[], "Sub Category":[]}
 # data_dict['category1'] = value1
 # # data_dict['category2'] = value2 
 # # masterlist.append(data_dict)
@@ -19,12 +19,7 @@ soup = BeautifulSoup(url.content, "lxml")
 ctg = soup.find_all("li")
 
 for i in ctg[6].next_siblings:
-    if i.text.strip() == "Networking":
-        data_dict['Sub Category'] = i.text.strip()
-        print(i.text.strip())
-    else:
-        data_dict['Category'] = i.text.strip()
-        print(i.text.strip())
+    data_dict["Category"] = i.text.strip()
   
 print(data_dict)
 
