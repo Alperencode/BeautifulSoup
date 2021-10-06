@@ -1,4 +1,4 @@
-<h1> Learning BeautifulSoup</h1>
+<h1>BeautifulSoup</h1>
 <p>
 
 In this repository i'll learn and practice about BeautifulSoup library on python.
