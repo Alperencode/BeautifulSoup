@@ -1,9 +1,10 @@
+from typing import Counter
 from bs4 import BeautifulSoup
 import time
 import requests
 import pandas as pd
 data_list = []
-
+counter = 0
 
 # --------- Gathering Links ---------
 
@@ -34,9 +35,11 @@ def get_magazine_links(url):
     for link in magazines:
         magazine_links.append(link.a.get('href'))
 
+# range loop for use get_pages function
 for pageNumber in range(1,last_page+1):
     get_pages(pageNumber)
 
+# using get_magazine_links function
 for url in linkList:
     get_magazine_links(url)
 
@@ -47,10 +50,14 @@ for url in linkList:
 # articles links which includes "roman"
 checked_links = []
 
+# gathering infos if the article passes the check 
 def createDataDict(checkledLink):
     url = requests.get(checkledLink)
     soup = BeautifulSoup(url.content,"lxml")
     dataDict = {}
+    global counter
+    counter += 1
+
     # Makale Başlığı
     article_title = soup.find("h3",class_="article-title").text.strip()
     dataDict['Makale Başlığı'] = article_title
@@ -66,6 +73,7 @@ def createDataDict(checkledLink):
     except: 
         author_name = article_authors.find("a").text.strip()
         dataDict['Yazar İsimleri'] = author_name
+
 
     # Yayın Yılı
     # Not: Yayın yılının değeri için class belirtilmediği için bulunduğu tabloyu çektim, <tr> taglarını aldım, <tr> taglarının içindeki değerlerden kontrol yaptım
@@ -91,16 +99,16 @@ def createDataDict(checkledLink):
     dataDict['Yayın PDF'] = pdf_link
     
     data_list.append(dataDict)
-    # if dataDict not in data_list:
-    #     data_list.append(dataDict)
+    print(f"{counter}. Article created")
 
-def get_roman_articles(magazineLink):
+# Checking articles
+def checkFunc(magazineLink):
     url = requests.get(magazineLink)
     soup = BeautifulSoup(url.content,"lxml")
 
     labels = soup.find_all("a",class_="card-title article-title")
     for label in labels:
-        # removing row number and creating string var for labels to check "roman"
+        # removing row number and creating string variable for labels to check "roman"
         labelText = label.text.split(".")
         labelText.pop(0)
         labelText = ' '.join(labelText)
@@ -110,28 +118,29 @@ def get_roman_articles(magazineLink):
             url = requests.get(url)
             soup = BeautifulSoup(url.content,"lxml")
             ozet_section = soup.find("div",class_="article-abstract data-section")
-            print(url)
             ozet_pTags = ozet_section.find_all("p")
+            # Created check bool to avoid making dict of same article
+            check = True
             for ozet in ozet_pTags:
                 if "yayın" not in ozet.text.lower():
-                    createDataDict(f"https:{label.get('href')}")
+                    check = True
+                else:
+                    check = False
+            # if check true -> create dict
+            if check:
+                createDataDict(f"https:{label.get('href')}")
 
 for magazinLink in magazine_links:
-    get_roman_articles(magazinLink)
+    checkFunc(magazinLink)
 
 # --------- Check "roman" and "yayın" End ---------
 
 # --------- Output to Excel ---------
 
-df = pd.DataFrame(data_list)
+dataFrame = pd.DataFrame(data_list)
 File_Name = "Article_Data"
 datatoexcel = pd.ExcelWriter(f"{File_Name}.xlsx",engine='xlsxwriter')
-df.to_excel(datatoexcel,index=False)
+dataFrame.to_excel(datatoexcel,index=False)
 datatoexcel.save()
 
 # --------- Output to Excel End ---------
-
-# romanLinkleri = ["https://dergipark.org.tr/tr/pub/19maysbd/issue/65148/960736","https://dergipark.org.tr/tr/pub/ak/issue/63406/941413","https://dergipark.org.tr/tr/pub/medalanya/issue/64601/895129","https://dergipark.org.tr/tr/pub/gaziaot/issue/64759/815831","https://dergipark.org.tr/tr/pub/adalya/issue/61897/837795",
-# "https://dergipark.org.tr/tr/pub/aduefebder/issue/63241/877766","https://dergipark.org.tr/tr/pub/akusosbil/issue/64981/873870","https://dergipark.org.tr/tr/pub/aicusbed/issue/61279/910019","https://dergipark.org.tr/tr/pub/apdad/issue/63126/824066","https://dergipark.org.tr/tr/pub/asbider/issue/65093/1000775",
-# "https://dergipark.org.tr/tr/pub/akaded/issue/62203/937493","https://dergipark.org.tr/tr/pub/akademik-hassasiyetler/issue/64679/922714","https://dergipark.org.tr/tr/pub/akademiksanat/issue/64719/898278","https://dergipark.org.tr/tr/pub/akademiksanat/issue/64719/898278",
-# "https://dergipark.org.tr/tr/pub/ktc/issue/62579/926317","https://dergipark.org.tr/tr/pub/akrajournal/issue/64897/881924","https://dergipark.org.tr/tr/pub/akrajournal/issue/64897/904068"]
