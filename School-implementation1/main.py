@@ -1,13 +1,10 @@
-from typing import Counter
 from bs4 import BeautifulSoup
-import time
 import requests
 import pandas as pd
 data_list = []
 counter = 0
 
 # --------- Gathering Links ---------
-
 linkList = []
 magazine_links = []
 
@@ -42,14 +39,9 @@ for pageNumber in range(1,last_page+1):
 # using get_magazine_links function
 for url in linkList:
     get_magazine_links(url)
-
 # --------- Gathering Links End ---------
 
 # --------- Check "roman" and "yayın" ---------
-
-# articles links which includes "roman"
-checked_links = []
-
 # gathering infos if the article passes the check 
 def createDataDict(checkledLink):
     url = requests.get(checkledLink)
@@ -132,15 +124,12 @@ def checkFunc(magazineLink):
 
 for magazinLink in magazine_links:
     checkFunc(magazinLink)
-
 # --------- Check "roman" and "yayın" End ---------
 
 # --------- Output to Excel ---------
-
 dataFrame = pd.DataFrame(data_list)
 File_Name = "Article_Data"
 datatoexcel = pd.ExcelWriter(f"{File_Name}.xlsx",engine='xlsxwriter')
 dataFrame.to_excel(datatoexcel,index=False)
 datatoexcel.save()
-
 # --------- Output to Excel End ---------
