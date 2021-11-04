@@ -62,7 +62,7 @@ def createDataDict(checkledLink):
         for name in author_names:
             names.append(name.text.strip())
         dataDict['Yazar İsimleri'] = names
-    except: 
+    except:
         author_name = article_authors.find("a").text.strip()
         dataDict['Yazar İsimleri'] = author_name
 
@@ -89,7 +89,6 @@ def createDataDict(checkledLink):
     shortLink = a_tags[0].get("href")
     pdf_link = f"https://dergipark.org.tr{shortLink}"
     dataDict['Yayın PDF'] = pdf_link
-    
     data_list.append(dataDict)
     print(f"{counter}. Article created")
 
