@@ -2,17 +2,12 @@ import requests
 from bs4 import BeautifulSoup
 
 session = requests.Session()
+payload = {
+        "keyword":"bilisim",
+        }
+url = session.post('https://tez.yok.gov.tr/UlusalTezMerkezi/SearchTez',data=payload)
 
-jar = requests.cookies.RequestsCookieJar()
-jar.set('JSESSIONID','"cjAIUx7f9Wtxj8bfvfIBGBdqSJ9oIJfSDeUGCzeW.jbossn183:TEZ_8150"; TS01e18b4b=01026844b89c4848bfc97900f060aef12256832907611f6ab11edda139859d52ec8eaf10b6bb904fd066bf1d819173e24fdcd5023425ecf1089cbe2ce34c08a0be51c92d46; TS014c3a3f=01026844b8a9860f4093d33cf4390e1becf2c2c24a611f6ab11edda139859d52ec8eaf10b61c368f13d388963cfb7cdd1bd4d3a960; _ga=GA1.3.1601084296.1635844401; _gid=GA1.3.187204205.1635844401; _gat=1; TScee0d053027=0868d5a3ffab20009a76fbbd7087befb1ab30ccb18411257b9814463a8f119f05c7a6c66d7b1d51f08c6de1b9211300090bc2c8d40d6b83daa777d1047b0dc17d70307d5fe4e4067d8e226e51b16f8c4c1f39990dace5304c0b6a28d83baed93')
-
-session.cookies = jar
-
-url = session.get('https://tez.yok.gov.tr/UlusalTezMerkezi/tezSorguSonucYeni.jsp')
-soup = BeautifulSoup(url.content, "lxml")
-
+print(url)
+print(url.cookies)
+soup = BeautifulSoup(url.content,"lxml")
 print(soup)
-
-# TScee0d053027=0868d5a3ffab200036a68655e82d26ec7f9e731d37ad45fe9284ca4b1002411aeb6e8885a9cd692008fab28dfb1130009aaf4b95d9a3fbdb28a0e8dc9701b7ad698cc86c129ef8b2c0c23cc73dd15b6eba5823c5331ead38c02cf97c223d53c3; Path=/
-
-# JSESSIONID="cjAIUx7f9Wtxj8bfvfIBGBdqSJ9oIJfSDeUGCzeW.jbossn183:TEZ_8150"; TS01e18b4b=01026844b89c4848bfc97900f060aef12256832907611f6ab11edda139859d52ec8eaf10b6bb904fd066bf1d819173e24fdcd5023425ecf1089cbe2ce34c08a0be51c92d46; TS014c3a3f=01026844b8a9860f4093d33cf4390e1becf2c2c24a611f6ab11edda139859d52ec8eaf10b61c368f13d388963cfb7cdd1bd4d3a960; _ga=GA1.3.1601084296.1635844401; _gid=GA1.3.187204205.1635844401; _gat=1; TScee0d053027=0868d5a3ffab20009a76fbbd7087befb1ab30ccb18411257b9814463a8f119f05c7a6c66d7b1d51f08c6de1b9211300090bc2c8d40d6b83daa777d1047b0dc17d70307d5fe4e4067d8e226e51b16f8c4c1f39990dace5304c0b6a28d83baed93
