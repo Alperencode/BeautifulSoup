@@ -1,0 +1,6 @@
+Makale Baþlýðý ‘Kabaaþý’ kayýsý çeþidinin meyve geliþim sürecindeki fiziksel, kimyasal ve renk deðiþimlerinin belirlenmesi
+Ýsimleri: ['Mehmet ÖZELÇÝ', 'Rafet ASLANTAÞ', 'Duygu ÖZELÇÝ', 'Erdoðan ÇÖÇEN']
+Yayýn Yýlý: 24 Haziran 2021
+Dergi ismi: Akademik Ziraat Dergisi
+Yayýn sayfa url: https://dergipark.org.tr/tr/pub/azd/issue/62964/736085
+Yayýn pdf linki: https://dergipark.org.tr/tr/download/article-file/1099598
