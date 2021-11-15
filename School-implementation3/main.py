@@ -7,8 +7,9 @@ import shutil
 data_list = []
 counter = 0
 checkCounter = 0
+
 try:
-    shutil.rmtree("jobs")
+    shutil.rmtree("articles")
 except:
     pass
 os.mkdir("articles")
@@ -56,9 +57,15 @@ def createDataDict(checkledLink):
     url = requests.get(checkledLink)
     soup = BeautifulSoup(url.content,"lxml")
     dataDict = {}
+    global checkCounter
     global counter
     counter += 1
-   # Makale Başlığı
+
+    # Özet 
+    ozet_section = soup.find("div",class_="article-abstract data-section")
+    dataDict['Özet'] = ozet_section.text
+
+    # Makale Başlığı
     article_title = soup.find("h3",class_="article-title").text.strip()
     dataDict['Makale Başlığı'] = article_title
 
@@ -98,9 +105,10 @@ def createDataDict(checkledLink):
     pdf_link = f"https://dergipark.org.tr{shortLink}"
     dataDict['Yayın PDF'] = pdf_link
     data_list.append(dataDict)
-    print(f"{counter}. Article created")
+    print(f"{counter}. Article created [{checkCounter}. Article]")
     with open(f"articles/article{counter}.txt",'w') as f:
         f.write(f"Makale Başlığı {dataDict['Makale Başlığı']}\n")
+        f.write(f"Özet: {dataDict['Özet']}\n")
         f.write(f"İsimleri: {dataDict['Yazar İsimleri']}\n")
         f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
         f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
@@ -129,10 +137,13 @@ def checkFunc(magazineLink):
                 # Created check bool to avoid making dict of same article
                 createDataDict(f"https:{label.get('href')}")
             except:
-                print("Error appered")
+                print(f"Error appered, url: {label.get('href')}")
+            checkCounter += 1
         else:
             checkCounter += 1
-            print(f"{checkCounter}. Checked")
+            # print(f"{checkCounter}. Checked") // to see checked ones
 for magazinLink in magazine_links:
     checkFunc(magazinLink)
+
+print(f"\nFinished checking articles on {checkCounter}.")
 # --------- Check "fizik" End ---------
