@@ -1,8 +1,7 @@
-from requests.structures import CaseInsensitiveDict
 import requests
 from bs4 import BeautifulSoup
-
-session = requests.Session()
+s = requests.Session()
+print(s.cookies)
 payload = {
         "keyword":"bilisim",
         "yil1":0,
@@ -24,19 +23,25 @@ payload = {
         "islem":4,
         }
 
-url = session.post('https://tez.yok.gov.tr/UlusalTezMerkezi/SearchTez',data=payload)
-headers = CaseInsensitiveDict()
-headers["Cookie"] =  'JSESSIONID="Cy0gHV4QN6DjdtbMEhPA5LlR4nIVwSo8z08H8RoV.jbossn183:TEZ_8150"';"TS01e18b4b=01026844b8c67d161539dfd8f5dd42d826cefa534f246868374012faf21e9e808d265c9a84f883a0f5fd8c3c097c6980d447638982213fdf0889e4bcc245ff69a7b98cb035";"TS014c3a3f=01026844b832c2fe02e63442694aa776005d952617246868374012faf21e9e808d265c9a848b2fd624a0bf5034cf8eb36ee901369a"
+url = s.post('https://tez.yok.gov.tr/UlusalTezMerkezi/SearchTez',data=payload)
+session_cookie = url.cookies.items()[1]
+print(session_cookie[0])
+print(session_cookie[1])
+req_args = {
+    'name':f'{session_cookie[0]}',
+    'value':f'{session_cookie[1]}'
+}
 
+optional_args = {
+    'domain':'tez.yok.gov.tr',
+    'path':'/UlusalTezMerkezi',
+}
 
-cookieValue = url.cookies.items()[1][1].replace('"',"")
-print(url.cookies.items())
+my_cookie = requests.cookies.create_cookie(**req_args,**optional_args)
+s.cookies.set_cookie(my_cookie)
+print(s.cookies)
 
-print(url.cookies)
-print(url.cookies.items()[0])
-url2 = session.get("https://tez.yok.gov.tr/UlusalTezMerkezi/tezSorguSonucYeni.jsp",headers = headers)
-soup = BeautifulSoup(url2.content,"lxml")
-print(soup)
-# print(url.cookies)
-# print(url.cookies.items()[1][1])
-# url2 = requests.get("https://tez.yok.gov.tr/UlusalTezMerkezi/tezSorguSonucYeni.jsp",)
+url = s.get('https://tez.yok.gov.tr/UlusalTezMerkezi/tezSorguSonucYeni.jsp',cookies=s.cookies)
+
+soup = BeautifulSoup(url.content,"lxml")
+print(soup.prettify()) 
