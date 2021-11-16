@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
+import time
 import requests
-import pandas as pd
 import os
 import shutil
 
@@ -51,14 +51,17 @@ for url in linkList:
     get_magazine_links(url)
 # --------- Gathering Links End ---------
 
-# --------- Check "roman" and "yayın" ---------
+# --------- Check Section ---------
 # gathering infos if the article passes the check 
 def createDataDict(checkledLink):
-    url = requests.get(checkledLink)
-    soup = BeautifulSoup(url.content,"lxml")
-    dataDict = {}
     global checkCounter
     global counter
+    url = requests.get(checkledLink)
+    if url.status_code == 429:
+        time.sleep(int(url.headers["Retry-After"]))
+        print(f"slept {int(url.headers['Retry-After'])}")
+    soup = BeautifulSoup(url.content,"lxml")
+    dataDict = {}
     counter += 1
 
     # Özet 
@@ -108,7 +111,7 @@ def createDataDict(checkledLink):
     print(f"{counter}. Article created [{checkCounter}. Article]")
     with open(f"articles/article{counter}.txt",'w') as f:
         f.write(f"Makale Başlığı {dataDict['Makale Başlığı']}\n")
-        f.write(f"Özet: {dataDict['Özet']}\n")
+        f.write(f"{dataDict['Özet']}\n")
         f.write(f"İsimleri: {dataDict['Yazar İsimleri']}\n")
         f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
         f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
@@ -117,9 +120,12 @@ def createDataDict(checkledLink):
  
 # Checking articles
 def checkFunc(magazineLink):
-    url = requests.get(magazineLink)
-    soup = BeautifulSoup(url.content,"lxml")
     global checkCounter
+    url = requests.get(magazineLink)
+    if url.status_code == 429:
+        time.sleep(int(url.headers["Retry-After"]))
+        print(f"slept {int(url.headers['Retry-After'])}")   
+    soup = BeautifulSoup(url.content,"lxml")
     labels = soup.find_all("a",class_="card-title article-title")
     for label in labels:
         # removing row number and creating string variable for labels to check "roman"
@@ -127,23 +133,22 @@ def checkFunc(magazineLink):
         labelText.pop(0)
         labelText = ' '.join(labelText)
         labelText = labelText.replace("\n","").lower()
+        # Control
         if "fizik" in labelText:
             url = f"https:{label.get('href')}"
             try:
-                url = requests.get(url)
-                soup = BeautifulSoup(url.content,"lxml")
-                ozet_section = soup.find("div",class_="article-abstract data-section")
-                ozet_pTags = ozet_section.find_all("p")
-                # Created check bool to avoid making dict of same article
                 createDataDict(f"https:{label.get('href')}")
             except:
-                print(f"Error appered, url: {label.get('href')}")
+                try:
+                    createDataDict(f"http:{label.get('href')}")
+                except:
+                    print(f"Error appered, url: https:{label.get('href')}")
             checkCounter += 1
         else:
             checkCounter += 1
             # print(f"{checkCounter}. Checked") // to see checked ones
 for magazinLink in magazine_links:
-    checkFunc(magazinLink)
+   checkFunc(magazinLink)
 
 print(f"\nFinished checking articles on {checkCounter}.")
-# --------- Check "fizik" End ---------
+# --------- Check Section End ---------
