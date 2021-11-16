@@ -7,6 +7,7 @@ import shutil
 data_list = []
 counter = 0
 checkCounter = 0
+errorCounter = 0
 
 try:
     shutil.rmtree("articles")
@@ -58,8 +59,10 @@ def createDataDict(checkledLink):
     global counter
     url = requests.get(checkledLink)
     if url.status_code == 429:
+        time.sleep(int(url.headers["Retry-After"]) + 10)
+        print(f"slept {int(url.headers['Retry-After']) + 10} seconds")   
+    if url.status_code == 429:
         time.sleep(int(url.headers["Retry-After"]))
-        print(f"slept {int(url.headers['Retry-After'])}")
     soup = BeautifulSoup(url.content,"lxml")
     dataDict = {}
     counter += 1
@@ -110,9 +113,9 @@ def createDataDict(checkledLink):
     data_list.append(dataDict)
     print(f"{counter}. Article created [{checkCounter}. Article]")
     with open(f"articles/article{counter}.txt",'w') as f:
-        f.write(f"Makale Başlığı {dataDict['Makale Başlığı']}\n")
-        f.write(f"{dataDict['Özet']}\n")
-        f.write(f"İsimleri: {dataDict['Yazar İsimleri']}\n")
+        f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
+        f.write(f"Özet: {dataDict['Özet']}\n")
+        f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
         f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
         f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
         f.write(f"Yayın sayfa url: {dataDict['Yayın Sayfa URL']}\n")
@@ -121,10 +124,13 @@ def createDataDict(checkledLink):
 # Checking articles
 def checkFunc(magazineLink):
     global checkCounter
+    global errorCounter
     url = requests.get(magazineLink)
     if url.status_code == 429:
+        time.sleep(int(url.headers["Retry-After"]) + 10)
+        print(f"slept {int(url.headers['Retry-After']) + 10} seconds")   
+    if url.status_code == 429:
         time.sleep(int(url.headers["Retry-After"]))
-        print(f"slept {int(url.headers['Retry-After'])}")   
     soup = BeautifulSoup(url.content,"lxml")
     labels = soup.find_all("a",class_="card-title article-title")
     for label in labels:
@@ -134,21 +140,22 @@ def checkFunc(magazineLink):
         labelText = ' '.join(labelText)
         labelText = labelText.replace("\n","").lower()
         # Control
-        if "fizik" in labelText:
-            url = f"https:{label.get('href')}"
+        url = f"https:{label.get('href')}"
+        try:
+            createDataDict(f"https:{label.get('href')}")
+        except:
             try:
-                createDataDict(f"https:{label.get('href')}")
+                createDataDict(f"http:{label.get('href')}")
             except:
-                try:
-                    createDataDict(f"http:{label.get('href')}")
-                except:
-                    print(f"Error appered, url: https:{label.get('href')}")
-            checkCounter += 1
-        else:
-            checkCounter += 1
+                errorCounter += 1
+                print(f"Error appered [{errorCounter}. Error] , url: https:{label.get('href')}")
+
+        checkCounter += 1
+        #else:
+        #    checkCounter += 1
             # print(f"{checkCounter}. Checked") // to see checked ones
 for magazinLink in magazine_links:
    checkFunc(magazinLink)
 
-print(f"\nFinished checking articles on {checkCounter}.")
+print(f"\nFinished checking articles on {checkCounter} with {errorCounter} errors.")
 # --------- Check Section End ---------
