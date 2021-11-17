@@ -119,10 +119,8 @@ def createDataDict(checkledLink):
     print(data_list)
     print("\n")
     # print(f"{counter}. Article created [{checkCounter}. Article]")
-    articleJson = json.dumps(dataDict)
     with open(f"article.json",'w') as f:
-        f.write(articleJson, indent=2)
-        f.write("\n")
+        json.dump(dataDict,f,indent=2)  
         #f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
         #f.write(f"Özet: {dataDict['Özet']}\n")
         #f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
