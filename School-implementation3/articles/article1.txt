@@ -1,6 +1,0 @@
-Makale Baþlýðý Migrenli Bireylerin Klinik Özellikleri ve Fiziksel Aktivite Ýliþkisi
-Ýsimleri: ['Hafize ALTAY', 'Þeyda TOPRAK ÇELENAY']
-Yayýn Yýlý: 30 Eylül 2021
-Dergi ismi: Adnan Menderes Üniversitesi Saðlýk Bilimleri Fakültesi Dergisi
-Yayýn sayfa url: https://dergipark.org.tr/tr/pub/amusbfd/issue/65164/928039
-Yayýn pdf linki: https://dergipark.org.tr/tr/download/article-file/1733908

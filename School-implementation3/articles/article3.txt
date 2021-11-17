@@ -1,6 +1,0 @@
-Makale Baþlýðý Electromagnetic-Temperature Analysis of Amorphous Core Transformer by Multiple Physics Method
-Ýsimleri: ['Atabak NAJAFI']
-Yayýn Yýlý: 31 Ekim 2021
-Dergi ismi: Afyon Kocatepe Üniversitesi Fen Ve Mühendislik Bilimleri Dergisi
-Yayýn sayfa url: https://dergipark.org.tr/tr/pub/akufemubid/issue/65740/836620
-Yayýn pdf linki: https://dergipark.org.tr/tr/download/article-file/1433731

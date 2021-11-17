@@ -3,6 +3,7 @@ import time
 import requests
 import os
 import shutil
+import json
 
 data_list = []
 counter = 0
@@ -10,10 +11,10 @@ checkCounter = 0
 errorCounter = 0
 
 try:
-    shutil.rmtree("articles")
+    shutil.rmtree("jsonFiles")
 except:
     pass
-os.mkdir("articles")
+os.mkdir("jsonFiles")
 
 # --------- Gathering Links ---------
 linkList = []
@@ -61,19 +62,27 @@ def createDataDict(checkledLink):
     if url.status_code == 429:
         time.sleep(int(url.headers["Retry-After"]) + 10)
         print(f"slept {int(url.headers['Retry-After']) + 10} seconds")   
-    if url.status_code == 429:
-        time.sleep(int(url.headers["Retry-After"]))
     soup = BeautifulSoup(url.content,"lxml")
     dataDict = {}
     counter += 1
 
-    # Özet 
-    ozet_section = soup.find("div",class_="article-abstract data-section")
-    dataDict['Özet'] = ozet_section.text
-
     # Makale Başlığı
     article_title = soup.find("h3",class_="article-title").text.strip()
     dataDict['Makale Başlığı'] = article_title
+    
+    # Özet 
+    ozet_section = soup.find("div",class_="article-abstract data-section")
+    dataDict['Özet'] = ozet_section.text.replace("\n","")
+    
+    # Konu
+    info_table = soup.find("table",class_="record_properties table")
+    tr_tags = info_table.find_all("tr")
+    try:
+        for tr_tag in tr_tags:
+            if tr_tag.th.text.strip() == "Konular":
+                dataDict['Konular'] = tr_tag.td.text.strip()
+    except:
+        dataDict['Konular'] = ''
 
     # Yazar İsimleri
     article_authors = soup.find("p",class_="article-authors")
@@ -86,7 +95,6 @@ def createDataDict(checkledLink):
     except:
         author_name = article_authors.find("a").text.strip()
         dataDict['Yazar İsimleri'] = author_name
-
 
     # Yayın Yılı
     # Not: Yayın yılının değeri için class belirtilmediği için bulunduğu tabloyu çektim, <tr> taglarını aldım, <tr> taglarının içindeki değerlerden kontrol yaptım
@@ -111,15 +119,17 @@ def createDataDict(checkledLink):
     pdf_link = f"https://dergipark.org.tr{shortLink}"
     dataDict['Yayın PDF'] = pdf_link
     data_list.append(dataDict)
+    # print(data_list)
+    # print("\n")
     print(f"{counter}. Article created [{checkCounter}. Article]")
-    with open(f"articles/article{counter}.txt",'w') as f:
-        f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
-        f.write(f"Özet: {dataDict['Özet']}\n")
-        f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
-        f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
-        f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
-        f.write(f"Yayın sayfa url: {dataDict['Yayın Sayfa URL']}\n")
-        f.write(f"Yayın pdf linki: {dataDict['Yayın PDF']}\n")
+    #with open("article{counter}.txt",'w',encoding='utf-8') as f:
+        #f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
+        #f.write(f"Özet: {dataDict['Özet']}\n")
+        #f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
+        #f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
+        #f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
+        #f.write(f"Yayın sayfa url: {dataDict['Yayın Sayfa URL']}\n")
+        #f.write(f"Yayın pdf linki: {dataDict['Yayın PDF']}\n")
  
 # Checking articles
 def checkFunc(magazineLink):
@@ -129,8 +139,6 @@ def checkFunc(magazineLink):
     if url.status_code == 429:
         time.sleep(int(url.headers["Retry-After"]) + 10)
         print(f"slept {int(url.headers['Retry-After']) + 10} seconds")   
-    if url.status_code == 429:
-        time.sleep(int(url.headers["Retry-After"]))
     soup = BeautifulSoup(url.content,"lxml")
     labels = soup.find_all("a",class_="card-title article-title")
     for label in labels:
@@ -145,7 +153,7 @@ def checkFunc(magazineLink):
             createDataDict(f"https:{label.get('href')}")
         except:
             try:
-                createDataDict(f"http:{label.get('href')}")
+                createDataDict(f"{label.get('href')}")
             except:
                 errorCounter += 1
                 print(f"Error appered [{errorCounter}. Error] , url: https:{label.get('href')}")
@@ -154,8 +162,14 @@ def checkFunc(magazineLink):
         #else:
         #    checkCounter += 1
             # print(f"{checkCounter}. Checked") // to see checked ones
+
 for magazinLink in magazine_links:
    checkFunc(magazinLink)
+
+with open(f'article.jsonl', 'w',encoding='utf-8') as outfile:
+    for entry in data_list:
+        json.dump(entry, outfile,ensure_ascii=False)
+        outfile.write('\n')
 
 print(f"\nFinished checking articles on {checkCounter} with {errorCounter} errors.")
 # --------- Check Section End ---------
