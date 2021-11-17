@@ -3,17 +3,18 @@ import time
 import requests
 import os
 import shutil
+import json
 
 data_list = []
 counter = 0
 checkCounter = 0
 errorCounter = 0
 
-try:
-    shutil.rmtree("articles")
-except:
-    pass
-os.mkdir("articles")
+#try:
+#    shutil.rmtree("articles")
+#except:
+#    pass
+#os.mkdir("articles")
 
 # --------- Gathering Links ---------
 linkList = []
@@ -48,7 +49,11 @@ for pageNumber in range(1,last_page+1):
     get_pages(pageNumber)
 
 # using get_magazine_links function
+forCounter = 0
 for url in linkList:
+    forCounter += 1
+    if forCounter >= 10:
+        break
     get_magazine_links(url)
 # --------- Gathering Links End ---------
 
@@ -111,15 +116,20 @@ def createDataDict(checkledLink):
     pdf_link = f"https://dergipark.org.tr{shortLink}"
     dataDict['Yayın PDF'] = pdf_link
     data_list.append(dataDict)
-    print(f"{counter}. Article created [{checkCounter}. Article]")
-    with open(f"articles/article{counter}.txt",'w') as f:
-        f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
-        f.write(f"Özet: {dataDict['Özet']}\n")
-        f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
-        f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
-        f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
-        f.write(f"Yayın sayfa url: {dataDict['Yayın Sayfa URL']}\n")
-        f.write(f"Yayın pdf linki: {dataDict['Yayın PDF']}\n")
+    print(data_list)
+    print("\n")
+    # print(f"{counter}. Article created [{checkCounter}. Article]")
+    articleJson = json.dumps(dataDict)
+    with open(f"article.json",'w') as f:
+        f.write(articleJson, indent=2)
+        f.write("\n")
+        #f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
+        #f.write(f"Özet: {dataDict['Özet']}\n")
+        #f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
+        #f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
+        #f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
+        #f.write(f"Yayın sayfa url: {dataDict['Yayın Sayfa URL']}\n")
+        #f.write(f"Yayın pdf linki: {dataDict['Yayın PDF']}\n")
  
 # Checking articles
 def checkFunc(magazineLink):
@@ -148,13 +158,17 @@ def checkFunc(magazineLink):
                 createDataDict(f"http:{label.get('href')}")
             except:
                 errorCounter += 1
-                print(f"Error appered [{errorCounter}. Error] , url: https:{label.get('href')}")
+                # print(f"Error appered [{errorCounter}. Error] , url: https:{label.get('href')}")
 
         checkCounter += 1
         #else:
         #    checkCounter += 1
             # print(f"{checkCounter}. Checked") // to see checked ones
+forCounter = 0
 for magazinLink in magazine_links:
+   forCounter += 1
+   if forCounter >= 10:
+        break
    checkFunc(magazinLink)
 
 print(f"\nFinished checking articles on {checkCounter} with {errorCounter} errors.")
