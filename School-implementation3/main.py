@@ -10,11 +10,11 @@ counter = 0
 checkCounter = 0
 errorCounter = 0
 
-#try:
-#    shutil.rmtree("articles")
-#except:
-#    pass
-#os.mkdir("articles")
+try:
+    shutil.rmtree("jsonFiles")
+except:
+    pass
+os.mkdir("jsonFiles")
 
 # --------- Gathering Links ---------
 linkList = []
@@ -45,15 +45,11 @@ def get_magazine_links(url):
         magazine_links.append(link.a.get('href'))
 
 # range loop for use get_pages function
-for pageNumber in range(1,last_page+1):
+for pageNumber in range(1,2):
     get_pages(pageNumber)
 
 # using get_magazine_links function
-forCounter = 0
 for url in linkList:
-    forCounter += 1
-    if forCounter >= 10:
-        break
     get_magazine_links(url)
 # --------- Gathering Links End ---------
 
@@ -72,13 +68,22 @@ def createDataDict(checkledLink):
     dataDict = {}
     counter += 1
 
-    # Özet 
-    ozet_section = soup.find("div",class_="article-abstract data-section")
-    dataDict['Özet'] = ozet_section.text
-
     # Makale Başlığı
     article_title = soup.find("h3",class_="article-title").text.strip()
     dataDict['Makale Başlığı'] = article_title
+    
+    # Özet 
+    ozet_section = soup.find("div",class_="article-abstract data-section")
+    dataDict['Özet'] = ozet_section.text.replace("\n","")
+    
+    # Konu
+    konuList = []
+    for tr_tag in tr_tags:
+        if tr_tag.th.text.strip() == "Konular":
+            subjects = tr_tag.td.text.strip()
+    #for subject in subjects.split(','):
+        #print("For loop")
+        # dataDict['Konular'].append(subject)      
 
     # Yazar İsimleri
     article_authors = soup.find("p",class_="article-authors")
@@ -91,7 +96,6 @@ def createDataDict(checkledLink):
     except:
         author_name = article_authors.find("a").text.strip()
         dataDict['Yazar İsimleri'] = author_name
-
 
     # Yayın Yılı
     # Not: Yayın yılının değeri için class belirtilmediği için bulunduğu tabloyu çektim, <tr> taglarını aldım, <tr> taglarının içindeki değerlerden kontrol yaptım
@@ -119,8 +123,9 @@ def createDataDict(checkledLink):
     print(data_list)
     print("\n")
     # print(f"{counter}. Article created [{checkCounter}. Article]")
-    with open(f"article.json",'w') as f:
-        json.dump(dataDict,f,indent=2)  
+    with open("article.json",'w',encoding='utf-8') as f:
+        json.dump(dataDict,f,indent=2,ensure_ascii=False)  
+
         #f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
         #f.write(f"Özet: {dataDict['Özet']}\n")
         #f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
@@ -162,11 +167,7 @@ def checkFunc(magazineLink):
         #else:
         #    checkCounter += 1
             # print(f"{checkCounter}. Checked") // to see checked ones
-forCounter = 0
 for magazinLink in magazine_links:
-   forCounter += 1
-   if forCounter >= 10:
-        break
    checkFunc(magazinLink)
 
 print(f"\nFinished checking articles on {checkCounter} with {errorCounter} errors.")
