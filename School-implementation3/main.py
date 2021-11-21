@@ -45,7 +45,7 @@ def get_magazine_links(url):
         magazine_links.append(link.a.get('href'))
 
 # range loop for use get_pages function
-for pageNumber in range(1,2):
+for pageNumber in range(1,last_page+1):
     get_pages(pageNumber)
 
 # using get_magazine_links function
@@ -62,8 +62,6 @@ def createDataDict(checkledLink):
     if url.status_code == 429:
         time.sleep(int(url.headers["Retry-After"]) + 10)
         print(f"slept {int(url.headers['Retry-After']) + 10} seconds")   
-    if url.status_code == 429:
-        time.sleep(int(url.headers["Retry-After"]))
     soup = BeautifulSoup(url.content,"lxml")
     dataDict = {}
     counter += 1
@@ -77,13 +75,14 @@ def createDataDict(checkledLink):
     dataDict['Özet'] = ozet_section.text.replace("\n","")
     
     # Konu
-    konuList = []
-    for tr_tag in tr_tags:
-        if tr_tag.th.text.strip() == "Konular":
-            subjects = tr_tag.td.text.strip()
-    #for subject in subjects.split(','):
-        #print("For loop")
-        # dataDict['Konular'].append(subject)      
+    info_table = soup.find("table",class_="record_properties table")
+    tr_tags = info_table.find_all("tr")
+    try:
+        for tr_tag in tr_tags:
+            if tr_tag.th.text.strip() == "Konular":
+                dataDict['Konular'] = tr_tag.td.text.strip()
+    except:
+        dataDict['Konular'] = ''
 
     # Yazar İsimleri
     article_authors = soup.find("p",class_="article-authors")
@@ -120,12 +119,10 @@ def createDataDict(checkledLink):
     pdf_link = f"https://dergipark.org.tr{shortLink}"
     dataDict['Yayın PDF'] = pdf_link
     data_list.append(dataDict)
-    print(data_list)
-    print("\n")
-    # print(f"{counter}. Article created [{checkCounter}. Article]")
-    with open("article.json",'w',encoding='utf-8') as f:
-        json.dump(dataDict,f,indent=2,ensure_ascii=False)  
-
+    # print(data_list)
+    # print("\n")
+    print(f"{counter}. Article created [{checkCounter}. Article]")
+    #with open("article{counter}.txt",'w',encoding='utf-8') as f:
         #f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
         #f.write(f"Özet: {dataDict['Özet']}\n")
         #f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
@@ -142,8 +139,6 @@ def checkFunc(magazineLink):
     if url.status_code == 429:
         time.sleep(int(url.headers["Retry-After"]) + 10)
         print(f"slept {int(url.headers['Retry-After']) + 10} seconds")   
-    if url.status_code == 429:
-        time.sleep(int(url.headers["Retry-After"]))
     soup = BeautifulSoup(url.content,"lxml")
     labels = soup.find_all("a",class_="card-title article-title")
     for label in labels:
@@ -158,17 +153,23 @@ def checkFunc(magazineLink):
             createDataDict(f"https:{label.get('href')}")
         except:
             try:
-                createDataDict(f"http:{label.get('href')}")
+                createDataDict(f"{label.get('href')}")
             except:
                 errorCounter += 1
-                # print(f"Error appered [{errorCounter}. Error] , url: https:{label.get('href')}")
+                print(f"Error appered [{errorCounter}. Error] , url: https:{label.get('href')}")
 
         checkCounter += 1
         #else:
         #    checkCounter += 1
             # print(f"{checkCounter}. Checked") // to see checked ones
+
 for magazinLink in magazine_links:
    checkFunc(magazinLink)
+
+with open(f'article.jsonl', 'w',encoding='utf-8') as outfile:
+    for entry in data_list:
+        json.dump(entry, outfile,ensure_ascii=False)
+        outfile.write('\n')
 
 print(f"\nFinished checking articles on {checkCounter} with {errorCounter} errors.")
 # --------- Check Section End ---------
