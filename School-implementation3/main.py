@@ -2,7 +2,6 @@ from bs4 import BeautifulSoup
 import time
 import requests
 import os
-import shutil
 import json
 
 data_list = []
@@ -10,11 +9,7 @@ counter = 0
 checkCounter = 0
 errorCounter = 0
 
-try:
-    shutil.rmtree("jsonFiles")
-except:
-    pass
-os.mkdir("jsonFiles")
+trmkdir("jsonFiles")
 
 # --------- Gathering Links ---------
 linkList = []
