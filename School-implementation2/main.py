@@ -1,7 +1,6 @@
 import requests
 from bs4 import BeautifulSoup
 s = requests.Session()
-print(s.cookies)
 payload = {
         "keyword":"bilisim",
         "yil1":0,
@@ -28,10 +27,12 @@ session_cookie = url.cookies.items()[1]
 print(session_cookie[0])
 print(session_cookie[1])
 req_args = {
-    'name':f'{session_cookie[0]}',
-    'value':f'{session_cookie[1]}'
+    'name':f'{str(session_cookie[0])}',
+    'value':f'{str(session_cookie[1])}'
+    #'name':'JSESSIONID',
+    #'value': '"bPuY8quhUIhyL3lC19WdK_mbXczlSz8bsEETq2Wt.jbossn182:TEZ_8150"'
 }
-
+print(req_args)
 optional_args = {
     'domain':'tez.yok.gov.tr',
     'path':'/UlusalTezMerkezi',
@@ -45,3 +46,4 @@ url = s.get('https://tez.yok.gov.tr/UlusalTezMerkezi/tezSorguSonucYeni.jsp',cook
 
 soup = BeautifulSoup(url.content,"lxml")
 print(soup.prettify()) 
+JSESSIONID="bPuY8quhUIhyL3lC19WdK_mbXczlSz8bsEETq2Wt.jbossn182:TEZ_8150"
