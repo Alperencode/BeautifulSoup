@@ -9,8 +9,6 @@ counter = 0
 checkCounter = 0
 errorCounter = 0
 
-trmkdir("jsonFiles")
-
 # --------- Gathering Links ---------
 linkList = []
 magazine_links = []
