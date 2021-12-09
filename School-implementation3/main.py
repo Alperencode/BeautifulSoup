@@ -5,6 +5,7 @@ import os
 import json
 
 data_list = []
+konu_list = []
 counter = 0
 checkCounter = 0
 errorCounter = 0
@@ -68,12 +69,16 @@ def createDataDict(checkledLink):
     dataDict['Özet'] = ozet_section.text.replace("\n","")
     
     # Konu
+    # split the values due ',' and take the first one
     info_table = soup.find("table",class_="record_properties table")
     tr_tags = info_table.find_all("tr")
     try:
         for tr_tag in tr_tags:
             if tr_tag.th.text.strip() == "Konular":
-                dataDict['Konular'] = tr_tag.td.text.strip()
+                first_konu = tr_tag.td.text.strip().split(",")[0]
+                dataDict['Konular'] = first_konu
+                if first_konu not in konu_list:
+                    konu_list.append(first_konu)
     except:
         dataDict['Konular'] = ''
 
@@ -165,4 +170,6 @@ with open(f'article.jsonl', 'w',encoding='utf-8') as outfile:
         outfile.write('\n')
 
 print(f"\nFinished checking articles on {checkCounter} with {errorCounter} errors.")
+for z in konu_list:
+    print(f"Konu: {z}")
 # --------- Check Section End ---------
