@@ -1,8 +1,8 @@
 from bs4 import BeautifulSoup
 import requests
 
-# then access the link and gather '# of units' & growth over 3 years,
-
+# This is project did not finished because of client unresponsiveness
+# but gained control of the main site just didn't scrape the data we need
 
 url = "https://www.entrepreneur.com/franchises/500/2021/1"
 url = requests.get(url)
@@ -41,6 +41,9 @@ for blue in Blues:
 
 def ScrapePage(link):
     url = f"https://www.entrepreneur.com/{link}"
+    
+    # Datas that need to be scraped
+
     # ranking = 
     # name =
     # related_categories =
@@ -74,12 +77,4 @@ def ScrapePage(link):
     # can_this_franchise_be_run_part_time = 
     # are_exclusive_territories_available = 
 
-
-
-
-
-
 # https://www.entrepreneur.com/franchises/dunkin
-
-
-# source.select('a[href^="/topics/t"]')
