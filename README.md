@@ -16,7 +16,7 @@ My Web-scraping and Data Analysis projects
   
 This repository will contain ***my own projects***, my ***UpWork jobs source codes\**** and ***the project that I'm working on with my teacher*** which mentioned as School-implementation.
 <br><br> 
-&emsp;So far the biggest project is [School-implementation-3](https://github.com/Alperencode/BeautifulSoup/tree/master/School-implementation3). That project is basically based on scraping all the data from some article site and giving them a meaning or making a model wich uses that data. Lastly, I converted that data into json lines. Now I'm working on a model to give a meaning to that data.
+&emsp;So far the biggest project is [DergiPark-Project](https://github.com/Alperencode/BeautifulSoup/tree/master/DergiPark-Project). That project is basically based on scraping all the data from one of the biggest article sites in Turkey and extracting it into different formats of files. This data can be used in Ai models to give meaning to this data or train any model with them.
 
 </p>
 
