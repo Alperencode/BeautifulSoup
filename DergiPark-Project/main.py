@@ -47,8 +47,9 @@ for url in linkList:
     get_magazine_links(url)
 # --------- Gathering Links End ---------
 
-# --------- Check Section ---------
-# gathering infos if the article passes the check 
+# --------- Parsing the Data --------- 
+# Creating data dictionary for each checked article
+# Note: For this project, I didn't add any controls so all links will be used
 def createDataDict(checkledLink):
     global checkCounter
     global counter
@@ -70,6 +71,8 @@ def createDataDict(checkledLink):
     
     # Konu
     # split the values due ',' and take the first one
+    # Note: This made for getting only the first 'Konu' of the article
+    # You can use 'dataDict['Konular'] = tr_tag.td.text.strip()' to get all 'Konu' values:   
     info_table = soup.find("table",class_="record_properties table")
     tr_tags = info_table.find_all("tr")
     try:
@@ -95,7 +98,8 @@ def createDataDict(checkledLink):
         dataDict['Yazar İsimleri'] = author_name
 
     # Yayın Yılı
-    # Not: Yayın yılının değeri için class belirtilmediği için bulunduğu tabloyu çektim, <tr> taglarını aldım, <tr> taglarının içindeki değerlerden kontrol yaptım
+    # Note: Because of the 'Yayın yılı' is not specified in any class, I gathered the table which has the 'Yayın yılı' data
+    # Then I made a control to find the 'Yayın yılı'
     info_table = soup.find("table",class_="record_properties table")
     tr_tags = info_table.find_all("tr")
     for tr_tag in tr_tags:
@@ -116,20 +120,33 @@ def createDataDict(checkledLink):
     shortLink = a_tags[0].get("href")
     pdf_link = f"https://dergipark.org.tr{shortLink}"
     dataDict['Yayın PDF'] = pdf_link
+    
+    # Parsing the data has been done
+    # I'm adding the data to the data_list
     data_list.append(dataDict)
-    # print(data_list)
-    # print("\n")
+
     print(f"{counter}. Article created [{checkCounter}. Article]")
-    #with open("article{counter}.txt",'w',encoding='utf-8') as f:
-        #f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
-        #f.write(f"Özet: {dataDict['Özet']}\n")
-        #f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
-        #f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
-        #f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
-        #f.write(f"Yayın sayfa url: {dataDict['Yayın Sayfa URL']}\n")
-        #f.write(f"Yayın pdf linki: {dataDict['Yayın PDF']}\n")
+
+    # Writing the information into txt file (Used in articles directory)
+    # But its not necessary for the main project
+
+    # with open("article{counter}.txt",'w',encoding='utf-8') as f:
+    #     f.write(f"Makale Başlığı: {dataDict['Makale Başlığı']}\n")
+    #     f.write(f"Özet: {dataDict['Özet']}\n")
+    #     f.write(f"Yazar isimleri: {dataDict['Yazar İsimleri']}\n")
+    #     f.write(f"Yayın Yılı: {dataDict['Yayın Yılı']}\n")
+    #     f.write(f"Dergi ismi: {dataDict['Dergi İsmi']}\n")
+    #     f.write(f"Yayın sayfa url: {dataDict['Yayın Sayfa URL']}\n")
+    #     f.write(f"Yayın pdf linki: {dataDict['Yayın PDF']}\n")
  
+
 # Checking articles
+# This made for adding controls to the data extraction
+# For example:
+# If you want to extract only articles with 'fizik' in their label, you can customize this function for it
+# Just need to add 'if' statement to the 'for label in labels:' loop (E.g: if 'fizik in label':) 
+
+# Because the purpose of this project is to extract all articles, I didn't add any controls
 def checkFunc(magazineLink):
     global checkCounter
     global errorCounter
@@ -157,19 +174,16 @@ def checkFunc(magazineLink):
                 print(f"Error appered [{errorCounter}. Error] , url: https:{label.get('href')}")
 
         checkCounter += 1
-        #else:
-        #    checkCounter += 1
-            # print(f"{checkCounter}. Checked") // to see checked ones
 
 for magazinLink in magazine_links:
    checkFunc(magazinLink)
+# --------- Parsing the Data End ---------
 
+# --------- Output of the Data ---------
 with open(f'article.jsonl', 'w',encoding='utf-8') as outfile:
     for entry in data_list:
         json.dump(entry, outfile,ensure_ascii=False)
         outfile.write('\n')
+# --------- Output of the Data End ---------
 
 print(f"\nFinished checking articles on {checkCounter} with {errorCounter} errors.")
-for z in konu_list:
-    print(f"Konu: {z}")
-# --------- Check Section End ---------
