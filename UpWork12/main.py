@@ -87,16 +87,15 @@ def ParseProductPage(url):
     dataDict['SKU'] = SafeFind(soup, tag="span", class_="sku")
 
     # Product Price
-    productPrices = SafeFind(soup, tag="p", selector="price")
+    productPrices = soup.find("p",class_="price")
     if productPrices:
-        dataDict['Product Price'] = productPrices.findAll("del")[2].text.strip()
-        dataDict['Product Sale Price'] = productPrices.find("ins").text.strip()
+        dataDict['Product Sale Price'] = productPrices.ins.text.strip()
+    dataDict['Product Price'] = soup.findAll("del")[2].text.strip()
 
     # Category & Brand
-    postedIn = SafeFind(soup, tag="span", class_="posted_in")
-    if postedIn:
-        dataDict['Category'] = postedIn[0].text.strip()
-        dataDict['Brand'] = postedIn[1].text.strip()
+    postedIn = soup.findAll("span",class_="posted_in")
+    dataDict['Category'] = postedIn[0].text.strip()
+    dataDict['Brand'] = postedIn[1].text.strip()
 
     # Image URL
     imageUrl = soup.find("figure",class_="woocommerce-product-gallery__wrapper").img.get('src')
@@ -121,14 +120,10 @@ def ParseProductPage(url):
 
 
 # Loops
-for pageNumber in range(1, GetMaxPage()+1):
-    url = f"https://service-workshopmanual.com/product-category/machine-vehicle-manuals/page/{pageNumber}"
+for pageNumber in range(1, 3):
+    url = f"https://service-workshopmanual.com/product-category/machine-vehicle-manuals/page/{pageNumber}/"
     for url in ScrapeURL(url):
-        try:
-            ParseProductPage(url)
-        except:
-            errorCounter += 1
-            print(f"Error: {url}")
+        ParseProductPage(url)
 
 for image in imageURLS:
     SaveImage(image, name=imageURLS.index(image)+1)
